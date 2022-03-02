@@ -8,8 +8,11 @@ from booknlp.booknlp import BookNLP
 
 
 class TextAnalyzer:
-    def __init__(self, model_params: dict):
-        self.model_params = model_params
+    def __init__(self):
+        model_params = {
+            "model": "small",
+            "pipeline": "entity,quote,event,coref",
+        }
         self.model = BookNLP("en", model_params)
 
         self.input_file = "data/sub.txt"
@@ -18,8 +21,8 @@ class TextAnalyzer:
         self.entities = pd.DataFrame()
         self.agent = pd.DataFrame()
         self.patient = pd.DataFrame()
-        self.poss = pd.DataFrame()
-        self.mod = pd.DataFrame()
+        self.possess = pd.DataFrame()
+        self.modifiers = pd.DataFrame()
 
     def analyze(self, book_id: str, srt_file_path: str):
         subs = self._read_data(srt_file_path)
@@ -110,9 +113,9 @@ class TextAnalyzer:
                         ),
                     ]
                 )
-                self.poss = pd.concat(
+                self.possess = pd.concat(
                     [
-                        self.poss,
+                        self.possess,
                         pd.DataFrame(
                             {
                                 "character_id": character_id,
@@ -128,9 +131,9 @@ class TextAnalyzer:
                         ),
                     ]
                 )
-                self.mod = pd.concat(
+                self.modifiers = pd.concat(
                     [
-                        self.mod,
+                        self.modifiers,
                         pd.DataFrame(
                             {
                                 "character_id": character_id,
@@ -164,18 +167,14 @@ class TextAnalyzer:
 
 
 if __name__ == "__main__":
-    model_params = {
-        "model": "small",
-        "pipeline": "entity,quote,event,coref",
-    }
-    analyzer = TextAnalyzer(model_params)
+    analyzer = TextAnalyzer()
     analyzer.analyze(
-        "avatar",
+        "encanto",
         "./data/raw/open-subtitles/Encanto.2021.1080p.WEB-DL.H264.DDP5.1-EVO.srt",
     )
     analyzer.quotes.to_csv("quotes.csv")
     analyzer.entities.to_csv("entities.csv")
     analyzer.agent.to_csv("agent.csv")
     analyzer.patient.to_csv("patient.csv")
-    analyzer.poss.to_csv("poss.csv")
-    analyzer.mod.to_csv("mod.csv")
+    analyzer.possess.to_csv("poss.csv")
+    analyzer.modifiers.to_csv("mod.csv")
